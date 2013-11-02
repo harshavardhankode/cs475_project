@@ -62,7 +62,7 @@ int win_h,win_w;
 
 int lid_angle= 60,door_angle=60;
 
-int lbox,lid;
+int lbox,lid,lift;
 
 int cube,t3,t2,t1,Neck,Head,Sh,UArm,Elbow,LArm,Wrist,Hand,Hip,Thigh,Knee,Leg,Ankle,Foot;
 
@@ -133,8 +133,8 @@ void init(void)
 	glEnable(GL_DEPTH_TEST);
 	glClearColor (0.0, 0.0, 0.0, 0.0);
 	glShadeModel (GL_SMOOTH); 
-	compile_box();
 	compile_man();
+	compile_box();
 	compile_room();
 	glEnable( GL_TEXTURE_2D );
 	loadBMP_custom("wood.bmp",wood_tex);
@@ -455,6 +455,10 @@ void keyboard( unsigned char key, int x, int y ) {
 			glEnable(GL_LIGHTING);
 			mode = 0;
 			compile_room();
+			break;
+		case 'e':		//set the view to look at the man 
+			LA[0] = -5.5; LA[1]=1.0; LA[2]= -2.0; LA[3]= -5.5; LA[4]= -1.0; LA[5]= -4.0; LA[6]= 0.0; LA[7]= 1.0; LA[8]= 0.0;
+			world_rotate[0] = 0.0;world_rotate[1] = 0.0;world_rotate[2] = 0.0;
 			break;
 		case 'r':		//reset the view ( bring to clicking view in mode 1
 			LA[0] = 0.0; LA[1]=0.0; LA[2]= 12.0; LA[3]= 0.0; LA[4]= 0.0; LA[5]= 0.0; LA[6]= 0.0; LA[7]= 1.0; LA[8]= 0.0;

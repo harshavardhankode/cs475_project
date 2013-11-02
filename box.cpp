@@ -1,6 +1,5 @@
 #include "defs.h"
-extern int lbox;
-extern int lid;
+extern int lbox,lid,lift,cube;
 extern int lid_angle;
 extern int wood_tex,tiles_tex;
 
@@ -9,45 +8,35 @@ void compile_box(){
 	lbox = glGenLists(1);
 	glNewList(lbox,GL_COMPILE); 
 		//base
-		glBegin(GL_QUADS);
-			glNormal3f(0.0, -1.0, 0.0);
-			glTexCoord2d(0.0,0.0); glVertex3f(1.0,0.0,0.0);
-			glTexCoord2d(1.0,0.0); glVertex3f(1.0,0.0,1.0);
-			glTexCoord2d(1.0,1.0); glVertex3f(-1.0,0.0,1.0);
-			glTexCoord2d(0.0,1.0); glVertex3f(-1.0,0.0,0.0);
-
+			glPushMatrix();
+				glTranslatef(0,0,0.5);
+				glScalef(2,0.02,1);
+				glCallList(cube);
+			glPopMatrix();	
 		//back
-
-			glNormal3f(0.0, 0.0, -1.0);
-			glTexCoord2d(0.0,0.0); glVertex3f(-1.0,1.0,0.0);
-			glTexCoord2d(1.0,0.0); glVertex3f(1.0,1.0,0.0);
-			glTexCoord2d(1.0,1.0); glVertex3f(1.0,0.0,0.0);
-			glTexCoord2d(0.0,1.0); glVertex3f(-1.0,0.0,0.0);	
-
+			glPushMatrix();
+				glTranslatef(0.0,0.5,0.0);
+				glScalef(2,1,0.02);
+				glCallList(cube);
+			glPopMatrix();		
 		//left
-
-			glNormal3f(-1.0, 0.0, 0.0);
-			glTexCoord2d(0.0,0.0); glVertex3f(-1.0,1.0,1.0);
-			glTexCoord2d(1.0,0.0); glVertex3f(-1.0,1.0,0.0);
-			glTexCoord2d(1.0,1.0); glVertex3f(-1.0,0.0,0.0);
-			glTexCoord2d(0.0,1.0); glVertex3f(-1.0,0.0,1.0);
-
+			glPushMatrix();
+				glTranslatef(-1.0,0.5,0.5);
+				glScalef(0.02,1,1);
+				glCallList(cube);
+			glPopMatrix();	
 		//right
-
-			glNormal3f(1.0, 0.0, 0.0);
-			glTexCoord2d(0.0,0.0); glVertex3f(1.0,0.0,1.0);
-			glTexCoord2d(1.0,0.0); glVertex3f(1.0,0.0,0.0);
-			glTexCoord2d(1.0,1.0); glVertex3f(1.0,1.0,0.0);
-			glTexCoord2d(0.0,1.0); glVertex3f(1.0,1.0,1.0);
-
+			glPushMatrix();
+				glTranslatef(1.0,0.5,0.5);
+				glScalef(0.02,1,1);
+				glCallList(cube);
+			glPopMatrix();	
 		//front
-
-			glNormal3f(0.0, 0.0, 1.0);
-			glTexCoord2d(0.0,0.0); glVertex3f(-1.0,0.0,1.0);
-			glTexCoord2d(1.0,0.0); glVertex3f(1.0,0.0,1.0);
-			glTexCoord2d(1.0,1.0); glVertex3f(1.0,1.0,1.0);
-			glTexCoord2d(0.0,1.0); glVertex3f(-1.0,1.0,1.0);
-		glEnd();
+			glPushMatrix();
+				glTranslatef(0.0,0.5,1.0);
+				glScalef(2,1,0.02);
+				glCallList(cube);
+			glPopMatrix();		
 	glEndList();
 
 	//lid
@@ -87,6 +76,17 @@ void compile_box(){
 		glEnd();
 
 	glEndList();
+
+
+	//lift
+	lift = glGenLists(1);
+	glNewList(lift,GL_COMPILE); 		
+			glPushMatrix();
+				glTranslatef(0,0,0.5);
+				glScalef(2,0.02,1);
+				glCallList(cube);
+			glPopMatrix();
+	glEndList();
 }
 
 
@@ -103,6 +103,17 @@ void draw_box(){
 		glRotatef(-lid_angle,1,0,0);
 		glCallList(lid);
 	glPopMatrix();	
+	glPushMatrix();
+		glTranslatef(0.0,lid_angle/120.0,0.0);
+		glCallList(lift);
+		glPushMatrix();	
+			glTranslatef(0.0,0.0,0.5);
+			glScalef(0.13,0.13,0.13);
+			glTranslatef(0.0,3.8,0.0);
+			draw_man();
+		glPopMatrix();
+	glPopMatrix();
+
 	glBindTexture(GL_TEXTURE_2D,0);
 	glDisable(GL_TEXTURE_2D);
 }

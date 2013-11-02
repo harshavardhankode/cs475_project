@@ -423,6 +423,7 @@ void draw_man(){
 
 
 	glPopMatrix();
+	glColor3f(1.0,1.0,1.0);
 	glBindTexture(GL_TEXTURE_2D,0);
 	glDisable( GL_TEXTURE_2D );
 
