@@ -1,7 +1,7 @@
 #include "defs.h"
 extern int cube,t3,t2,t1,Neck,Head,Sh,UArm,Elbow,LArm,Wrist,Hand,Hip,Thigh,Knee,Leg,Ankle,Foot;
 extern int body_angles[34];
-extern int wood_tex,tiles_tex,face_tex;
+extern int door_tex,tiles_tex,face_tex,stone_tex;
 
 void compile_man(){
 	cube = glGenLists(1);
@@ -235,13 +235,18 @@ void compile_man(){
 }
 
 void draw_man(){
-	glEnable( GL_TEXTURE_2D );
-	glBindTexture(GL_TEXTURE_2D,tiles_tex);
+	glDisable( GL_TEXTURE_2D );
+	glColor3f(0.0,0.0,1.0);
 	glPushMatrix();
 		glCallList(t3);		//torso 3
 		glPushMatrix();
 			glTranslatef(0.0,0.8,0.0);
+			glColor3f(1.0,1.0,1.0);
+			glEnable( GL_TEXTURE_2D );
+			glBindTexture(GL_TEXTURE_2D,tiles_tex);
 			glCallList(t2);		//torso 2	
+			glDisable( GL_TEXTURE_2D );
+			glColor3f(0.0,0.0,1.0);
 			glPushMatrix();
 				glRotatef(body_angles[5],0,0,1);
 				glRotatef(body_angles[3],1,0,0);
@@ -249,36 +254,39 @@ void draw_man(){
 				glTranslatef(0.0,1.0,0.0);
 				glCallList(t1);		//torso 1
 
+	
+				glEnable( GL_TEXTURE_2D );
+				glColor3f(1.0,1.0,1.0);
 				glPushMatrix();
-					glColor3f(1.0,0.0,0.0);
-					glTranslatef(0.8+0.15,0.8-0.15,0.0);		
+					glTranslatef(0.8+0.15,0.8-0.15,0.0);
+					glBindTexture(GL_TEXTURE_2D,tiles_tex);		
 					glCallList(Sh);		//Right Shoulder
 					glPushMatrix();
-						glColor3f(1.0,1.0,0.0);
 						glRotatef(body_angles[15],0,0,1);
 						glRotatef(body_angles[13],-1,0,0);
 						glRotatef(body_angles[14],0,1,0);
 						glTranslatef(0.0,-0.65,0.0);
+						glBindTexture(GL_TEXTURE_2D,door_tex);
 						glCallList(UArm);	// R Upper Arm
 						glPushMatrix();		
-							glColor3f(1.0,0.0,0.0);
 							glTranslatef(0.0,-0.65,0.0);
+							glBindTexture(GL_TEXTURE_2D,tiles_tex);
 							glCallList(Elbow);	// R Elbow 
 							glPushMatrix();
 								glRotatef(body_angles[16],-1,0,0);
-								glColor3f(1.0,1.0,0.0);
 								glTranslatef(0.0,-0.65,0.0);
+								glBindTexture(GL_TEXTURE_2D,door_tex);
 								glCallList(LArm);	// R Lower Arm
 								glPushMatrix();		
-									glColor3f(1.0,0.0,0.0);
 									glTranslatef(0.0,-0.65,0.0);
+									glBindTexture(GL_TEXTURE_2D,tiles_tex);
 									glCallList(Wrist);	// R Wrist 
 									glPushMatrix();		
-										glColor3f(0.0,0.0,1.0);
 										glRotatef(body_angles[19],0,0,1);
 										glRotatef(body_angles[17],-1,0,0);
 										glRotatef(body_angles[18],0,1,0);
 										glTranslatef(0.0,-0.4,0.0);
+										glBindTexture(GL_TEXTURE_2D,door_tex);
 										glCallList(Hand);	// R Hand 
 									glPopMatrix();
 								glPopMatrix();
@@ -288,34 +296,34 @@ void draw_man(){
 				glPopMatrix();
 				
 				glPushMatrix();
-					glColor3f(1.0,0.0,0.0);
-					glTranslatef(-0.8-0.15,0.8-0.15,0.0);		
+					glTranslatef(-0.8-0.15,0.8-0.15,0.0);	
+					glBindTexture(GL_TEXTURE_2D,tiles_tex);	
 					glCallList(Sh);		//Left Shoulder
 					glPushMatrix();
-						glColor3f(1.0,1.0,0.0);
 						glRotatef(body_angles[8],0,0,1);
 						glRotatef(body_angles[6],-1,0,0);
 						glRotatef(body_angles[7],0,1,0);
 						glTranslatef(0.0,-0.65,0.0);
+						glBindTexture(GL_TEXTURE_2D,door_tex);
 						glCallList(UArm);	// L Upper Arm
 						glPushMatrix();		
-							glColor3f(1.0,0.0,0.0);
 							glTranslatef(0.0,-0.65,0.0);
+							glBindTexture(GL_TEXTURE_2D,tiles_tex);
 							glCallList(Elbow);	// L Elbow 
 							glPushMatrix();
-								glColor3f(1.0,1.0,0.0);
 								glRotatef(body_angles[9],-1,0,0);
 								glTranslatef(0.0,-0.65,0.0);
+								glBindTexture(GL_TEXTURE_2D,door_tex);
 								glCallList(LArm);	// L Lower Arm
 								glPushMatrix();		
-									glColor3f(1.0,0.0,0.0);
 									glTranslatef(0.0,-0.65,0.0);
+									glBindTexture(GL_TEXTURE_2D,tiles_tex);
 									glCallList(Wrist);	// L Wrist 
 									glPushMatrix();
 										glRotatef(body_angles[12],0,0,1);
 										glRotatef(body_angles[10],-1,0,0);
 										glRotatef(body_angles[11],0,1,0);	
-										glColor3f(0.0,0.0,1.0);
+										glBindTexture(GL_TEXTURE_2D,door_tex);
 										glTranslatef(0.0,-0.4,0.0);
 										glCallList(Hand);	// L Hand 
 									glPopMatrix();
@@ -326,18 +334,16 @@ void draw_man(){
 				glPopMatrix();
 
 				glPushMatrix();
-					glColor3f(1.0,0.0,0.0);
+					glBindTexture(GL_TEXTURE_2D,tiles_tex);
 					glTranslatef(0.0,0.8+0.15,0.0);
 					glCallList(Neck);			//Neck	
 					glPushMatrix();
-						glColor3f(1.0,1.0,1.0);
 						glRotatef(body_angles[2],0,0,1);
 						glRotatef(body_angles[0],-1,0,0);
 						glRotatef(body_angles[1],0,1,0);
 						glTranslatef(0.0,0.5+0.15,0.0);
 						glBindTexture(GL_TEXTURE_2D,face_tex);
 						glCallList(Head);		//Head
-						glBindTexture(GL_TEXTURE_2D,tiles_tex);
 					glPopMatrix();
 				glPopMatrix();
 
@@ -346,31 +352,31 @@ void draw_man(){
 		glPopMatrix();
 		
 		glPushMatrix();
-			glColor3f(1.0,0.0,0.0);
+			glBindTexture(GL_TEXTURE_2D,tiles_tex);
 			glTranslatef(-0.6+0.15,-0.6-0.15,0.0);		
 			glCallList(Hip);		//Left Hip
 			glPushMatrix();
-				glColor3f(1.0,1.0,0.0);
+				glBindTexture(GL_TEXTURE_2D,door_tex);
 				glRotatef(body_angles[22],0,0,1);
 				glRotatef(body_angles[20],-1,0,0);
 				glRotatef(body_angles[21],0,1,0);
 				glTranslatef(0.0,-0.65,0.0);
 				glCallList(Thigh);	// L Thigh
 				glPushMatrix();		
-					glColor3f(1.0,0.0,0.0);
+					glBindTexture(GL_TEXTURE_2D,tiles_tex);
 					glTranslatef(0.0,-0.65,0.0);
 					glCallList(Knee);	// L Knee 
 					glPushMatrix();
-						glColor3f(1.0,1.0,0.0);
+						glBindTexture(GL_TEXTURE_2D,door_tex);
 						glRotatef(body_angles[23],1,0,0);
 						glTranslatef(0.0,-0.65,0.0);
 						glCallList(Leg);	// L Leg
 						glPushMatrix();		
-							glColor3f(1.0,0.0,0.0);
+							glBindTexture(GL_TEXTURE_2D,tiles_tex);
 							glTranslatef(0.0,-0.65,0.0);
 							glCallList(Ankle);	// L Ankle 
 							glPushMatrix();		
-								glColor3f(1.0,1.0,0.0);
+								glBindTexture(GL_TEXTURE_2D,door_tex);
 								glRotatef(body_angles[26],0,0,1);
 								glRotatef(body_angles[24],-1,0,0);
 								glRotatef(body_angles[25],0,1,0);
@@ -384,31 +390,31 @@ void draw_man(){
 		glPopMatrix();
 
 		glPushMatrix();
-			glColor3f(1.0,0.0,0.0);
+			glBindTexture(GL_TEXTURE_2D,tiles_tex);
 			glTranslatef(0.6-0.15,-0.6-0.15,0.0);		
 			glCallList(Hip);		//Right Hip
 			glPushMatrix();
-				glColor3f(1.0,1.0,0.0);
+				glBindTexture(GL_TEXTURE_2D,door_tex);
 				glRotatef(body_angles[29],0,0,1);
 				glRotatef(body_angles[27],-1,0,0);
 				glRotatef(body_angles[28],0,1,0);
 				glTranslatef(0.0,-0.65,0.0);
 				glCallList(Thigh);	// R Thigh
 				glPushMatrix();		
-					glColor3f(1.0,0.0,0.0);
+					glBindTexture(GL_TEXTURE_2D,tiles_tex);
 					glTranslatef(0.0,-0.65,0.0);
 					glCallList(Knee);	// R Knee 
 					glPushMatrix();
-						glColor3f(1.0,1.0,0.0);
+						glBindTexture(GL_TEXTURE_2D,door_tex);
 						glRotatef(body_angles[30],1,0,0);
 						glTranslatef(0.0,-0.65,0.0);
 						glCallList(Leg);	// R Leg
 						glPushMatrix();		
-							glColor3f(1.0,0.0,0.0);
+							glBindTexture(GL_TEXTURE_2D,tiles_tex);
 							glTranslatef(0.0,-0.65,0.0);
 							glCallList(Ankle);	// R Ankle 
 							glPushMatrix();		
-								glColor3f(1.0,1.0,0.0);
+								glBindTexture(GL_TEXTURE_2D,door_tex);
 								glRotatef(body_angles[33],0,0,1);
 								glRotatef(body_angles[31],-1,0,0);
 								glRotatef(body_angles[32],0,1,0);
