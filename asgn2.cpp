@@ -1,6 +1,7 @@
 #include <GL/glut.h>
 #include<stdio.h>
 #include<iostream>
+#include<fstream>
 #include "defs.h"
 
 float LA[9]= {0.0, 0.0, 12.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0};
@@ -85,8 +86,16 @@ bool l1=true,l2 = true;
 
 GLuint wood_tex,tiles_tex,face_tex,stone_tex,door_tex;
 
-GLdouble eqn1[4] = { 0.0, 0.0, -1.0, 4.6 };
+GLdouble eqn1[4] = { 0.0, 0.0, -1.0, 4.6 };			//eqn of the mirror plane
 	
+int fps = 48; 			// fps of the animation
+float curr_angles[34];
+float next_angles[34];	
+int curr_lid_angle;
+int next_lid_angle;	
+std::ifstream keyFileIn;
+
+
 void evalBezier(float t, int num){
 	float temp [100][3];
 
@@ -121,6 +130,105 @@ void draw_curve(){
 	glEnd();
 
 }
+
+void animate(int value){
+	if(mode == 2 && value < 1000 ){
+		evalBezier(float(value) / 1000.0 , point_count);
+		LA[0]= result[0]; LA[1]= result[1]; LA[2]= result[2];
+
+		glutPostRedisplay();
+		glutTimerFunc (10, animate, value+1);
+	}	
+}
+
+
+
+void controlKeyFrame(int val){		// 1 = add , 2 = clear
+	std::ofstream keyFile;
+	if(val == 1){
+
+		keyFile.open("keyframes.txt",std::ios::app);
+		keyFile << l1 << " " <<l2 << " " <<lid_angle;
+		
+		for ( int i=0;i<34;i++){
+			keyFile<< " " << body_angles[i] ;
+		}	
+		
+		keyFile<<"\n"; 
+		keyFile.close();
+	}
+	else if(val == 2){
+		keyFile.open("keyframes.txt",std::ios::trunc);
+		keyFile.close();
+	}		
+}
+
+int loadNextKeyFrame(int val){			//val = 2 : initial load (2 key frames) ; val = 1 subsequent loads
+
+	for ( int i=0;i<34;i++){
+		curr_angles[i] = next_angles[i];
+	}
+	curr_lid_angle = next_lid_angle;
+	keyFileIn.peek();
+	if (keyFileIn.good()){
+		keyFileIn >> l1 >> l2 >> next_lid_angle;
+
+		for ( int i=0;i<34;i++){
+			keyFileIn >> next_angles[i] ;
+		}
+
+		while(keyFileIn.get() != '\n');
+		keyFileIn.peek();
+		if(val == 1)
+			return 0;
+	}	
+	else{
+		return 1;
+	}
+
+	if(val == 2){		// Initial load requires first two key frames
+
+		for ( int i=0;i<34;i++){
+			curr_angles[i] = next_angles[i];
+		}
+		curr_lid_angle = next_lid_angle;
+		keyFileIn.peek();
+		if (keyFileIn.good()){
+			keyFileIn >> l1 >> l2 >> next_lid_angle;
+
+			for ( int i=0;i<34;i++){
+				keyFileIn >> next_angles[i] ;
+			}
+
+			while(keyFileIn.get() != '\n');
+			keyFileIn.peek();
+			return 0;
+		}	
+		else{
+			return 1;
+		}
+	}
+}
+
+void animateKeyFrames(int i){
+
+		if(i == fps){
+			int r = loadNextKeyFrame(1);
+			if(r == 0) glutTimerFunc (0, animateKeyFrames,0);
+			else keyFileIn.close();
+		}
+		else{
+			std::cout<<i<<"\n";
+			for ( int j=0;j<34;j++){
+				body_angles[j]  = (curr_angles[j]* (float) (fps - i) / (float)fps)  + (next_angles[j] *(float) i / (float)fps) ;
+			}
+			lid_angle = (curr_lid_angle * (fps - i) +   next_lid_angle * (i)) / float (fps); 
+			glutPostRedisplay();
+			glutTimerFunc (1000/fps, animateKeyFrames,i+1);
+		}
+}
+
+
 
 
 
@@ -167,6 +275,7 @@ void init(void)
 	compile_man();
 	compile_box();
 	compile_room();
+
 }
 
 void loadBMP_custom(const char * imagepath,GLuint& textureID){
@@ -377,15 +486,7 @@ void reshape (int w, int h)
    glMatrixMode (GL_MODELVIEW);
 }
 
-void animate(int value){
-	if(mode == 2 && value < 1000 ){
-		evalBezier(float(value) / 1000.0 , point_count);
-		LA[0]= result[0]; LA[1]= result[1]; LA[2]= result[2];
 
-		glutPostRedisplay();
-		glutTimerFunc (10, animate, value+1);
-	}	
-}
 
 void keyboard( unsigned char key, int x, int y ) {
 
@@ -406,11 +507,11 @@ void keyboard( unsigned char key, int x, int y ) {
 			break;
 		case ';': 
 			if(door_angle<90)
-				door_angle++;
+				door_angle+=1;
 			break;
 		case 39: 
 			if(door_angle>0)
-				door_angle--;
+				door_angle-=1;
 			break;
 		case 'w': 
 			world_rotate[0]++;
@@ -501,7 +602,18 @@ void keyboard( unsigned char key, int x, int y ) {
 			else
 				glDisable(GL_LIGHT1);
 			break;
-
+		case 'q':
+			controlKeyFrame(1);
+			break;
+		case 't':
+			controlKeyFrame(2);
+			break;
+		case 'y':
+			keyFileIn.open("keyframes.txt");
+			int r = loadNextKeyFrame(2);			
+			if(r == 0) animateKeyFrames(0);
+			else keyFileIn.close();
+			break;
 	}	
 	glutPostRedisplay();
 }
