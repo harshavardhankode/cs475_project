@@ -350,13 +350,15 @@ void draw_room(){
 
 	glPopMatrix();
 
-	glPushMatrix(); 	//Mirror frame
-		glBindTexture(GL_TEXTURE_2D,wood_tex);
-		glEnable( GL_TEXTURE_2D );
-		glTranslatef(-5.0,-2.0,4.6);
-		glScalef(2.0,4.0,1.0);
-		glCallList(mirror_frame);
-	glPopMatrix();
+	if (mode != 1){
+		glPushMatrix(); 	//Mirror frame
+			glBindTexture(GL_TEXTURE_2D,wood_tex);
+			glEnable( GL_TEXTURE_2D );
+			glTranslatef(-5.0,-2.0,4.6);
+			glScalef(2.0,4.0,1.0);
+			glCallList(mirror_frame);
+		glPopMatrix();
+	}
 
 	glBindTexture(GL_TEXTURE_2D,0);
 	glDisable(GL_TEXTURE_2D);
