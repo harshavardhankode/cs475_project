@@ -27,16 +27,16 @@ int min_limit[34] = {	//	x    y    z
 							-90.0, -90.0, -90.0,  	//Neck	 		0-2			
 							-90.0, -90.0, -90.0,	//Torso			3-5			
 							-90.0, -90.0, -90.0,	//LShoulder		6-8			
-							-90.0,					//LElbow		9			
+							 0.0,					//LElbow		9			
 							-90.0, -90.0, -90.0,	//LWrist		10-12	
 							-90.0, -90.0, -90.0,	//RShoulder		13-15		
-							-90.0,					//RElbow		16			
+							0.0,					//RElbow		16			
 							-90.0, -90.0, -90.0,	//RWrist		17-19		
 							-90.0, -90.0, -90.0,	//LHip			20-22		
-							-90.0,					//LKnee			23			
+							0.0,					//LKnee			23			
 							-90.0, -90.0, -90.0,	//LAnkle		24-26		
 							-90.0, -90.0, -90.0,	//RHip			27-29		
-							-90.0,					//RKnee			30		
+							0.0,					//RKnee			30		
 							-90.0, -90.0, -90.0,	//RAnkle		31-33		
 						};
 
@@ -44,16 +44,16 @@ int max_limit[34] = {	//	x    y    z
 							90.0, 90.0, 90.0,  		//Neck	 		0-2			
 							90.0, 90.0, 90.0,		//Torso			3-5			
 							90.0, 90.0, 90.0,		//LShoulder		6-8			
-							90.0,					//LElbow		9			
+							180.0,					//LElbow		9			
 							90.0, 90.0, 90.0,		//LWrist		10-12	
 							90.0, 90.0, 90.0,		//RShoulder		13-15		
-							90.0,					//RElbow		16			
+							180.0,					//RElbow		16			
 							90.0, 90.0, 90.0,		//RWrist		17-19		
 							90.0, 90.0, 90.0,		//LHip			20-22		
-							90.0,					//LKnee			23			
+							180.0,					//LKnee			23			
 							90.0, 90.0, 90.0,		//LAnkle		24-26		
 							90.0, 90.0, 90.0,		//RHip			27-29		
-							90.0,					//RKnee			30		
+							180.0,					//RKnee			30		
 							90.0, 90.0, 90.0,		//RAnkle		31-33		
 						};
 
@@ -89,11 +89,18 @@ GLuint wood_tex,tiles_tex,face_tex,stone_tex,door_tex;
 GLdouble eqn1[4] = { 0.0, 0.0, -1.0, 4.6 };			//eqn of the mirror plane
 	
 int fps = 48; 			// fps of the animation
+int fpk = 12;			// frames per keyframe
 float curr_angles[34];
 float next_angles[34];	
 int curr_lid_angle;
 int next_lid_angle;	
 std::ifstream keyFileIn;
+
+
+bool recording=true;
+unsigned int framenum=0;
+unsigned char *pRGB;
+
 
 
 void evalBezier(float t, int num){
@@ -212,19 +219,19 @@ int loadNextKeyFrame(int val){			//val = 2 : initial load (2 key frames) ; val =
 
 void animateKeyFrames(int i){
 
-		if(i == fps){
+		if(i == fpk){
 			int r = loadNextKeyFrame(1);
 			if(r == 0) glutTimerFunc (0, animateKeyFrames,0);
 			else keyFileIn.close();
 		}
 		else{
-			std::cout<<i<<"\n";
+			//std::cout<<i<<"\n";
 			for ( int j=0;j<34;j++){
-				body_angles[j]  = (curr_angles[j]* (float) (fps - i) / (float)fps)  + (next_angles[j] *(float) i / (float)fps) ;
+				body_angles[j]  = (curr_angles[j]* (float) (fpk - i) / (float)fpk)  + (next_angles[j] *(float) i / (float)fpk) ;
 			}
-			lid_angle = (curr_lid_angle * (fps - i) +   next_lid_angle * (i)) / float (fps); 
+			lid_angle = (curr_lid_angle * (fpk - i) +   next_lid_angle * (i)) / float (fpk); 
 			glutPostRedisplay();
-			glutTimerFunc (1000/fps, animateKeyFrames,i+1);
+			glutTimerFunc (1000.0/fps, animateKeyFrames,i+1);
 		}
 }
 
@@ -334,6 +341,31 @@ void loadBMP_custom(const char * imagepath,GLuint& textureID){
 }
 
 
+
+void capture_frame(unsigned int framenum)
+{
+  //global pointer float *pRGB
+  pRGB = new unsigned char [3 * (win_w+1) * (win_h+1) ];
+
+
+  // set the framebuffer to read
+  //default for double buffered
+  glReadBuffer(GL_BACK);
+
+  glPixelStoref(GL_PACK_ALIGNMENT,1);//for word allignment
+  
+  glReadPixels(0, 0, win_w, win_h, GL_RGB, GL_UNSIGNED_BYTE, pRGB);
+  char filename[200];
+  sprintf(filename,"frames/frame_%04d.ppm",framenum);
+  std::ofstream out(filename, std::ios::out);
+  out<<"P6"<<std::endl;
+  out<<win_w<<" "<<win_h<<" 255"<<std::endl;
+  out.write(reinterpret_cast<char const *>(pRGB), (3 * (win_w+1) * (win_h+1)) * sizeof(int));
+  out.close();
+
+  //function to store pRGB in a file named count
+  delete pRGB;
+}
 
 
 void display(void)
@@ -471,7 +503,8 @@ void display(void)
 
 	glPopMatrix();
 
-
+	if (recording)
+		capture_frame(framenum++);
 
 	glutSwapBuffers ();
 }
