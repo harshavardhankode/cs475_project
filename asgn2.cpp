@@ -61,7 +61,7 @@ int max_limit[34] = {	//	x    y    z
 int world_rotate[3] = {0,0,0};
 int win_h,win_w;
 
-int lid_angle= 60,door_angle=60;
+int lid_angle= 90,door_angle=60;
 
 int lbox,lid,lift;
 
@@ -76,7 +76,6 @@ float px=0,py=0,pz = 0;
 GLfloat ctrlpoints [100][3];
 int point_count = 0;
 GLfloat result [3];
-
 
 int curr_joint=0;
 int curr_num=0;
@@ -97,8 +96,8 @@ int next_lid_angle;
 std::ifstream keyFileIn;
 
 
-bool recording=true;
-unsigned int framenum=0;
+bool recording=false;
+unsigned int framenum=200;
 unsigned char *pRGB;
 
 
@@ -139,12 +138,12 @@ void draw_curve(){
 }
 
 void animate(int value){
-	if(mode == 2 && value < 1000 ){
-		evalBezier(float(value) / 1000.0 , point_count);
+	if(mode == 2 && value < 200 ){
+		evalBezier(float(value) / 200.0 , point_count);
 		LA[0]= result[0]; LA[1]= result[1]; LA[2]= result[2];
 
 		glutPostRedisplay();
-		glutTimerFunc (10, animate, value+1);
+		glutTimerFunc (1000.0/fps, animate, value+1);
 	}	
 }
 
@@ -528,6 +527,8 @@ void keyboard( unsigned char key, int x, int y ) {
 		curr_num = key - '0';
 		curr_joint = prev_num*10 + curr_num;
 	}
+	
+	int r;
 
 	switch(key) {
 		case '.': 
@@ -586,7 +587,7 @@ void keyboard( unsigned char key, int x, int y ) {
 			compile_room();
 			break;
 		case 'e':		//set the view to look at the man 
-			LA[0] = -5.5; LA[1]=1.0; LA[2]= -2.0; LA[3]= -5.5; LA[4]= -1.0; LA[5]= -4.0; LA[6]= 0.0; LA[7]= 1.0; LA[8]= 0.0;
+			LA[0] = -5.5; LA[1]=1.0; LA[2]= -2.0; LA[3]= -5.5; LA[4]= 0.0; LA[5]= -4.0; LA[6]= 0.0; LA[7]= 1.0; LA[8]= 0.0;
 			world_rotate[0] = 0.0;world_rotate[1] = 0.0;world_rotate[2] = 0.0;
 			break;
 		case 'r':		//reset the view ( bring to clicking view in mode 1
@@ -603,7 +604,7 @@ void keyboard( unsigned char key, int x, int y ) {
 			break;
 		case 'v': 		//animation mode
 			glEnable(GL_LIGHTING);
-			LA[3]= -6.0; LA[4]= -1.0; LA[5]= -4.0;			// making lookat towards box
+			LA[3]= -5.5; LA[4]= 0.0; LA[5]= -4.0;			// making lookat towards box
 			mode = 2; 
 			compile_room();
 			glutTimerFunc (10, animate, 0);
@@ -643,10 +644,20 @@ void keyboard( unsigned char key, int x, int y ) {
 			break;
 		case 'y':
 			keyFileIn.open("keyframes.txt");
-			int r = loadNextKeyFrame(2);			
+			r = loadNextKeyFrame(2);			
 			if(r == 0) animateKeyFrames(0);
 			else keyFileIn.close();
 			break;
+		case 'f':
+			recording = !recording;
+			break;
+		case 'g':
+			ctrlpoints[point_count][0] = -5.5;
+			ctrlpoints[point_count][1] = 1.0;
+			ctrlpoints[point_count][2] = -2.0;
+			point_count++;
+			break;
+		
 	}	
 	glutPostRedisplay();
 }
