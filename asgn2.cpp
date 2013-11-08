@@ -241,9 +241,7 @@ void animateKeyFrames(int i){
 void init(void) 
 {
 
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
-	glEnable(GL_LIGHT1);
+
 	glEnable(GL_DEPTH_TEST);
 	glClearColor (0.0, 0.0, 0.0, 0.0);
 	glShadeModel (GL_SMOOTH); 
@@ -257,10 +255,8 @@ void init(void)
 	glDisable( GL_TEXTURE_2D );
 
 
-
-	glEnable(GL_COLOR_MATERIAL);	
 	glColorMaterial(GL_FRONT, GL_DIFFUSE);
-
+	glEnable(GL_COLOR_MATERIAL);	
 
 	// Lamp light
 	GLfloat light_ambient[] = { 0.0, 0.0, 0.0, 1.0 };
@@ -277,6 +273,15 @@ void init(void)
 	glLightfv(GL_LIGHT1, GL_AMBIENT, light_ambient1);
 	glLightfv(GL_LIGHT1, GL_DIFFUSE, light_diffuse1);
 	glLightfv(GL_LIGHT1, GL_SPECULAR, light_specular1);
+
+	GLfloat lmodel_ambient[] = { 0.5, 0.5, 0.5, 1.0 };
+	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, lmodel_ambient);
+	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
+
+
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	glEnable(GL_LIGHT1);
 
 	compile_man();
 	compile_box();
